@@ -1,8 +1,0 @@
-Header {
-   background: #B31942; /* Old Glory Red */
-   color: white;
-}
-Footer {
-   background: #0A3161; /* Old Glory Blue */
-   color: white;
-}
