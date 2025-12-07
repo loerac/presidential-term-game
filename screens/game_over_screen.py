@@ -4,6 +4,7 @@ from textual.containers import Vertical, Center
 from textual.widgets import Header, Footer, Button, Static
 from textual.screen import Screen
 
+from config import get_css_path
 from screens.constants import ButtonId
 
 
@@ -11,7 +12,7 @@ class GameOverScreen(Screen):
     """Screen displayed when user has answered all the president’s term or
     player has given up."""
 
-    CSS_PATH = "../css/game_over_screen.tcss"
+    CSS_PATH = get_css_path("game_over_screen.tcss")
     BINDINGS = [
         ("r", "restart", "Restart Quiz"),
         ("q", "quit", "Quit"),

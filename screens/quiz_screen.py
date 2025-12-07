@@ -7,6 +7,7 @@ from textual.widgets import Header, Footer, Button, Static
 from textual.screen import Screen
 from textual.message import Message
 
+from config import get_css_path
 from models.presidents import President, ALL_PRESIDENTS
 from screens import GameOverScreen, constants
 from screens.constants import ButtonVariant
@@ -15,7 +16,7 @@ from screens.constants import ButtonVariant
 class QuizScreen(Screen):
     """The main screen for the quiz game."""
 
-    CSS_PATH = "../css/quiz_screen.tcss"
+    CSS_PATH = get_css_path("quiz_screen.tcss")
     BINDINGS = [
         ("a", "check_choice(0)", "Choice A"),
         ("b", "check_choice(1)", "Choice B"),
