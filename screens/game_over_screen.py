@@ -6,6 +6,7 @@ from textual.screen import Screen
 
 from config import get_css_path
 from screens.constants import ButtonId
+from screens.scoreboard_screen import ScoreboardScreen
 
 
 class GameOverScreen(Screen):
@@ -14,6 +15,7 @@ class GameOverScreen(Screen):
 
     CSS_PATH = get_css_path("game_over_screen.tcss")
     BINDINGS = [
+        ("s", "view_scoreboard", "View Scoreboard"),
         ("r", "restart", "Restart Quiz"),
         ("q", "quit", "Quit"),
     ]
@@ -22,6 +24,7 @@ class GameOverScreen(Screen):
         self,
         score: int,
         total_questions: int,
+        duration: int,
         name: Optional[str] = None,
         id: Optional[str] = None,
         classes: Optional[str] = None,
@@ -30,6 +33,7 @@ class GameOverScreen(Screen):
         super().__init__(name, id, classes)
         self.score = score
         self.total_questions = total_questions
+        self.duration = duration
 
     def compose(self) -> ComposeResult:
         """Create the final widgets."""
@@ -43,18 +47,22 @@ class GameOverScreen(Screen):
         with Vertical(id="GameOverContainer"):
             yield Static("Game Over", classes="title")
             yield Static(
-                f"You finished the quiz with a final score of {self.score} out of {self.total_questions} ({percentage:.0f}%)!",
+                f"You finished the quiz with a final score of {self.score} out of {self.total_questions}"
+                f" ({percentage:.0f}%) in {self.duration:.1f} seconds!",
                 classes="message",
             )
             with Center():
                 yield Button("Restart Quiz", id=ButtonId.RESTART)
+                yield Button("View Scoreboard", id=ButtonId.VIEW_SCOREBOARD)
                 yield Button("Quit Application", id=ButtonId.QUIT)
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         """Handle button clicks."""
-        match event.button.action:
+        match event.button.id:
             case ButtonId.RESTART:
                 self.action_restart()
+            case ButtonId.VIEW_SCOREBOARD:
+                self.action_view_scoreboard()
             case ButtonId.QUIT:
                 self.action_quit()
 
@@ -65,3 +73,7 @@ class GameOverScreen(Screen):
     def action_quit(self) -> None:
         """Quit the application."""
         self.app.exit()
+
+    def action_view_scoreboard(self) -> None:
+        """Pushes the scoreboard screen."""
+        self.app.push_screen(ScoreboardScreen())

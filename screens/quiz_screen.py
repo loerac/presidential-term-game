@@ -1,4 +1,6 @@
 import random
+from datetime import datetime
+from time import time
 from typing import Union
 
 from textual.app import ComposeResult
@@ -7,8 +9,9 @@ from textual.widgets import Header, Footer, Button, Static
 from textual.screen import Screen
 from textual.message import Message
 
-from config import get_css_path
-from models.presidents import President, ALL_PRESIDENTS
+from config import SCOREBOARD, get_css_path
+from models import GameLog, President, Result
+from models.presidents import ALL_PRESIDENTS
 from screens import GameOverScreen, constants
 from screens.constants import ButtonVariant
 
@@ -35,6 +38,12 @@ class QuizScreen(Screen):
             super().__init__()
             self.selected_year = selected_year
 
+    @property
+    def duration(self) -> int:
+        end_time = time()
+        duration = end_time - self.start_time
+        return int(duration)
+
     def compose(self) -> ComposeResult:
         """Create the main widgets for the screen."""
         yield Header()
@@ -44,28 +53,30 @@ class QuizScreen(Screen):
             yield Static(constants.FLAG_ART, id="FlagArt")
             yield Static("Loading...", id="QuestionText")
             with Horizontal(id="ChoicesContainer"):
-                yield Button(
-                    "A. Choice A", id="choice-0", variant=ButtonVariant.PRIMARY
-                )
-                yield Button(
-                    "B. Choice B", id="choice-1", variant=ButtonVariant.PRIMARY
-                )
-                yield Button(
-                    "C. Choice C", id="choice-2", variant=ButtonVariant.PRIMARY
-                )
-                yield Button(
-                    "D. Choice D", id="choice-3", variant=ButtonVariant.PRIMARY
-                )
+                for letter, number in constants.CHOICE_BUTTONS:
+                    yield Button(
+                        f"Choice {letter}",
+                        id=f"choice-{number}",
+                        variant=ButtonVariant.PRIMARY,
+                    )
+
             yield Static(
                 "Select the correct term year for the President above.",
                 id="FeedbackText",
             )
-            yield Button(
-                "Next President",
-                id="NextButton",
-                variant=ButtonVariant.DEFAULT,
-                disabled=True,
-            )
+
+            with Horizontal(id="QuizOptionContainer"):
+                yield Button(
+                    "Next President",
+                    id="NextButton",
+                    variant=ButtonVariant.DEFAULT,
+                    disabled=True,
+                )
+                yield Button(
+                    "Give up",
+                    id="GiveUp",
+                    variant=ButtonVariant.DEFAULT,
+                )
 
     def on_mount(self) -> None:
         """Called when the screen is mounted."""
@@ -75,14 +86,27 @@ class QuizScreen(Screen):
         self.score = 0
         self.total_questions_answered = 0
 
+        self.question_results = []
+        self.start_time = time()
+
         self.next_question()
 
     def get_random_president(self) -> Union[President, None]:
         """Selects a random president from the list."""
         if not self.remaining_presidents:
+            game_log = GameLog(
+                date=datetime.now(),
+                score=self.score,
+                total_questions=self.total_questions_answered,
+                duration=self.duration,
+                results=self.question_results,
+            )
+            SCOREBOARD.append(game_log)
             self.app.pop_screen()
             game_over_screen = GameOverScreen(
-                score=self.score, total_questions=self.total_questions_answered
+                score=self.score,
+                total_questions=self.total_questions_answered,
+                duration=self.duration,
             )
             self.app.push_screen(game_over_screen)
             return
@@ -105,9 +129,13 @@ class QuizScreen(Screen):
         feedback_text.update("Select the correct term year for the President above.")
         next_button.disabled = True
 
-        for i, year in enumerate(self.curr_choices):
+        zipped = zip(constants.CHOICE_BUTTONS, self.curr_choices)
+        for i, param in enumerate(zipped):
+            letter = param[0][0]
+            year = param[1]
+
             button = self.query_one(f"#choice-{i}", Button)
-            button.label = f"{chr(65 + i)}. {year}"
+            button.label = f"{letter}. {year}"
             button.disabled = False
             button.variant = ButtonVariant.PRIMARY
 
@@ -117,10 +145,20 @@ class QuizScreen(Screen):
 
     def action_game_over(self) -> None:
         """Action handler to go to Game Over screen"""
-        self.app.pop_screen()
+        game_log = GameLog(
+            date=datetime.now(),
+            score=self.score,
+            total_questions=self.total_questions_answered,
+            duration=self.duration,
+            results=self.question_results,
+        )
+        SCOREBOARD.append(game_log)
 
+        self.app.pop_screen()
         game_over_screen = GameOverScreen(
-            score=self.score, total_questions=self.total_questions_answered
+            score=self.score,
+            total_questions=self.total_questions_answered,
+            duration=self.duration,
         )
         self.app.push_screen(game_over_screen)
         return
@@ -141,6 +179,9 @@ class QuizScreen(Screen):
         elif event.button.id == "NextButton":
             self.next_question()
 
+        elif event.button.id == "GiveUp":
+            self.action_game_over()
+
     def on_quiz_screen_choice_selected(self, message: ChoiceSelected) -> None:
         """Handle the user selecting a choice."""
         if self.curr_president is None:
@@ -157,6 +198,14 @@ class QuizScreen(Screen):
             self.total_questions_answered += 1
             if is_correct:
                 self.score += 1
+
+            self.question_results.append(
+                Result(
+                    president=self.curr_president,
+                    is_correct=is_correct,
+                    selected_year=selected_year,
+                ),
+            )
 
         # Disable all choice buttons after a selection is made
         for i in range(4):

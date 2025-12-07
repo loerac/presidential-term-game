@@ -26,4 +26,13 @@ class ButtonVariant(StrEnum):
 
 class ButtonId(StrEnum):
     RESTART = auto()
+    VIEW_SCOREBOARD = auto()
     QUIT = auto()
+
+
+CHOICE_BUTTONS = [
+    ("A", 0),
+    ("B", 1),
+    ("C", 2),
+    ("D", 3),
+]

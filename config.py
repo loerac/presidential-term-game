@@ -1,7 +1,12 @@
 from pathlib import Path, PosixPath
+from typing import List
+
+from models import GameLog
 
 CURRENT_DIR = Path.cwd()
 CSS_DIR = Path.joinpath(CURRENT_DIR, "css")
+
+SCOREBOARD: List[GameLog] = []
 
 
 def get_css_path(file_name: str) -> PosixPath:

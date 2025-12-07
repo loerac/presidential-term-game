@@ -49,7 +49,35 @@ Button.warning {
    color: white;
 }
 
+#QuizOptionContainer {
+   width: 100%;
+   height: auto;
+   column-span: 2;
+   margin-bottom: 2;
+   align: center middle;
+}
+
+#QuizOptionContainer Button {
+   width: 1fr;
+   margin: 0 25;
+   text-align: left;
+   background: #0A3161;
+   color: white;
+}
+
 #NextButton {
+   column-span: 2;
+   margin-bottom: 2;
+   align: center middle;
+   width: auto;
+   background: #0A3161;
+   color: white;
+}
+
+#GiveUp {
+   column-span: 2;
+   margin-bottom: 2;
+   align: center middle;
    width: auto;
    background: #0A3161;
    color: white;

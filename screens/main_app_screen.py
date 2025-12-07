@@ -2,7 +2,7 @@ from textual.app import App
 from textual.screen import Screen
 
 from config import get_css_path
-from screens import GameOverScreen, QuizScreen
+from screens import GameOverScreen, ResultDetailScreen, ScoreboardScreen, QuizScreen
 
 
 class PresidentQuizApp(App):
@@ -10,8 +10,10 @@ class PresidentQuizApp(App):
 
     TITLE = "Presidential Term Quiz"
     SCREENS = {
-        "quiz": QuizScreen,
+        "details": ResultDetailScreen,
         "game_over": GameOverScreen,
+        "scoreboard": ScoreboardScreen,
+        "quiz": QuizScreen,
     }
     CSS_PATH = get_css_path("app.tcss")
 

@@ -1,0 +1,22 @@
+#ScoreboardHeader {
+    margin-bottom: 1;
+    color: #B22234; /* Red header text */
+}
+
+#ScoreboardList {
+    border: solid #3C3B6E;
+    max-height: 10;
+    overflow-y: scroll;
+}
+
+ScoreboardEntry {
+    padding: 0 1;
+    width: 100%;
+    height: 20%;
+    background: transparent;
+}
+
+ScoreboardEntry:focus {
+    background: #3C3B6E;
+    color: white;
+}
