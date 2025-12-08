@@ -93,29 +93,19 @@ class QuizScreen(Screen):
 
     def get_random_president(self) -> Union[President, None]:
         """Selects a random president from the list."""
-        if not self.remaining_presidents:
-            game_log = GameLog(
-                date=datetime.now(),
-                score=self.score,
-                total_questions=self.total_questions_answered,
-                duration=self.duration,
-                results=self.question_results,
-            )
-            SCOREBOARD.append(game_log)
-            self.app.pop_screen()
-            game_over_screen = GameOverScreen(
-                score=self.score,
-                total_questions=self.total_questions_answered,
-                duration=self.duration,
-            )
-            self.app.push_screen(game_over_screen)
-            return
+        next_president = None
+        if self.remaining_presidents:
+            next_president = self.remaining_presidents.pop()
 
-        return self.remaining_presidents.pop()
+        return next_president
 
     def next_question(self) -> None:
         """Sets up the next question."""
         self.curr_president = self.get_random_president()
+        if self.curr_president is None:
+            self.action_game_over()
+            return
+
         self.curr_choices = self.curr_president.generate_choices()
 
         # Get references to widgets

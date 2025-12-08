@@ -19,6 +19,7 @@ class PresidentQuizApp(App):
 
     def on_mount(self) -> None:
         """Called after the app is mounted."""
+        self.theme = "tokyo-night"
         self.push_screen("quiz")
 
     def action_restart_quiz(self) -> None:

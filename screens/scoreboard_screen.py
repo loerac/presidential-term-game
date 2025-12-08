@@ -1,7 +1,7 @@
 from typing import Optional
 
 from textual.app import ComposeResult
-from textual.containers import Vertical, Horizontal
+from textual.containers import Horizontal, ScrollableContainer, Vertical
 from textual.widgets import Header, Footer, Static, Button
 from textual.screen import Screen
 from textual.widget import Widget
@@ -67,6 +67,7 @@ class ResultDetailScreen(Screen):
 
         with Vertical(id="GameOverContainer"):
             yield Static("Detailed Results", classes="title")
+            # yield ScrollableContainer(detail_view)
             yield detail_view
 
 

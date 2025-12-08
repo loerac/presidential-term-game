@@ -129,6 +129,7 @@ ALL_PRESIDENTS = [
     President(name="Donald Trump", start=2025, end=2029, ordinal_number=47),
 ]
 
+
 if __name__ == "__main__":
     first_pres = ALL_PRESIDENTS[0]
     assert first_pres.within_term(1791)
